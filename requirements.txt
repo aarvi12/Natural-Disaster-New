@@ -4,3 +4,4 @@ geopy
 folium
 requests
 streamlit-folium
+streamlit_js_eval
