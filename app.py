@@ -69,19 +69,8 @@ Include 3-5 steps, mention communication, medical help, safety zones, and local 
 with st.sidebar:
     st.header("📍 Location & Disaster")
     
-    # Try browser location
-    st.markdown("**Get location automatically (browser GPS):**")
-    if JS_EVAL_AVAILABLE:
-        if st.button("📡 Use My Current Location"):
-            loc = streamlit_js_eval(js_expressions="navigator.geolocation.getCurrentPosition", key="get_loc", timeout=20)
-            if loc and 'coords' in loc:
-                st.session_state.lat = loc['coords']['latitude']
-                st.session_state.lon = loc['coords']['longitude']
-                st.success("✅ Location updated from browser!")
-    else:
-        st.warning("⚠️ `streamlit-js-eval` not installed. Falling back to manual address entry.")
-
-    address = st.text_input("Or enter address manually:", placeholder="Ex: 1600 Amphitheatre Pkwy, Mountain View, CA")
+   
+    address = st.text_input("Enter address:", placeholder="Ex: 1600 Amphitheatre Pkwy, Mountain View, CA")
 
     disaster_type = st.selectbox("🌋 Disaster Type:", DISASTER_OPTIONS)
     radius_miles = st.slider("📏 Search Radius (miles):", 1, 10, 5)
@@ -89,7 +78,7 @@ with st.sidebar:
 
 # Determine coordinates
 lat, lon = None, None
-detected_address = "Not found"
+detected_address =""
 if "lat" in st.session_state and "lon" in st.session_state:
     lat, lon = st.session_state.lat, st.session_state.lon
     geolocator = Nominatim(user_agent="disaster_helper")
@@ -103,7 +92,11 @@ elif address:
     detected_address = address if lat and lon else "Address not found"
 
 # Show detected address
-st.markdown(f"### 📌 Detected/Entered Address: `{detected_address}`")
+if detected_address =="":
+    st.markdown("### 📌 Detected Address")
+   
+else: 
+    st.markdown(f"### 📌 Detected/Entered Address: `{detected_address}`")
 
 # If location is valid, proceed
 if lat and lon:
