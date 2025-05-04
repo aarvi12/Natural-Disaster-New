@@ -1,5 +1,5 @@
-openai>=0.27.0
-streamlit>=1.16.0
+openai
+streamlit
 geopy
 folium
 requests
