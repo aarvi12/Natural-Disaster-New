@@ -101,10 +101,28 @@ else:
 # If location is valid, proceed
 if lat and lon:
     # Rescue Plan
-    with st.spinner("🧠 Generating Rescue Plan..."):
-        st.markdown("## 📝 AI-Generated Rescue Plan")
-        plan = generate_rescue_plan(disaster_type, detected_address)
-        st.markdown(f"""
+    st.markdown("## 📝 AI-Generated Rescue Plan")
+
+    # Use a cache key so map interactions (zoom/pan) which cause reruns do not
+    # re-trigger the OpenAI call. The key is based on disaster type + address.
+    plan_key = f"ai_plan::{disaster_type}::{detected_address}"
+
+    # Regenerate button allows explicit refresh of the plan
+    #regen = st.button("🔄 Regenerate Plan")
+
+    # Generate plan only if not present or user requested regeneration
+    if  plan_key not in st.session_state:
+        with st.spinner("🧠 Generating Rescue Plan..."):
+            try:
+                plan = generate_rescue_plan(disaster_type, detected_address)
+            except Exception as e:
+                # Store a helpful error message instead of crashing on rerun
+                plan = f"Failed to generate plan: {e}"
+            st.session_state[plan_key] = plan
+    else:
+        plan = st.session_state.get(plan_key, "")
+
+    st.markdown(f"""
 <div style="background-color:#FDF1DC; padding: 15px; border-radius: 10px; border-left: 5px solid #FFA726;">
 {plan}
 </div>
